@@ -14,11 +14,11 @@ use Ergonode\Core\Domain\Entity\AbstractId;
 use Ergonode\EventSourcing\Infrastructure\DomainEventInterface;
 use Ergonode\EventSourcing\Infrastructure\Exception\UnsupportedEventException;
 use Ergonode\EventSourcing\Infrastructure\Projector\DomainEventProjectorInterface;
-use Ergonode\Reader\Domain\Event\ReaderCreatedEvent;
+use Ergonode\Reader\Domain\Event\ReaderDeletedEvent;
 
 /**
  */
-class ReaderCreatedEventProjector implements DomainEventProjectorInterface
+class ReaderDeletedEventProjector implements DomainEventProjectorInterface
 {
     private const TABLE = 'importer.reader';
 
@@ -40,7 +40,7 @@ class ReaderCreatedEventProjector implements DomainEventProjectorInterface
      */
     public function supports(DomainEventInterface $event): bool
     {
-        return $event instanceof ReaderCreatedEvent;
+        return $event instanceof ReaderDeletedEvent;
     }
 
     /**
@@ -49,15 +49,13 @@ class ReaderCreatedEventProjector implements DomainEventProjectorInterface
     public function projection(AbstractId $aggregateId, DomainEventInterface $event): void
     {
         if (!$this->supports($event)) {
-            throw new UnsupportedEventException($event, ReaderCreatedEvent::class);
+            throw new UnsupportedEventException($event, ReaderDeletedEvent::class);
         }
 
-        $this->connection->insert(
+        $this->connection->delete(
             self::TABLE,
             [
                 'id' => $aggregateId->getValue(),
-                'name' => $event->getName(),
-                'type' => $event->getType(),
             ]
         );
     }
