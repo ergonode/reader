@@ -10,11 +10,11 @@ declare(strict_types = 1);
 namespace Ergonode\Reader\Persistence\Dbal\Projector;
 
 use Doctrine\DBAL\Connection;
-use Ergonode\Reader\Domain\Event\ReaderCreatedEvent;
+use Ergonode\Reader\Domain\Event\ReaderDeletedEvent;
 
 /**
  */
-class ReaderCreatedEventProjector
+class ReaderDeletedEventProjector
 {
     private const TABLE = 'importer.reader';
 
@@ -32,18 +32,16 @@ class ReaderCreatedEventProjector
     }
 
     /**
-     * @param ReaderCreatedEvent $event
+     * @param ReaderDeletedEvent $event
      *
      * @throws \Doctrine\DBAL\DBALException
      */
-    public function __invoke(ReaderCreatedEvent $event): void
+    public function __invoke(ReaderDeletedEvent $event): void
     {
-        $this->connection->insert(
+        $this->connection->delete(
             self::TABLE,
             [
                 'id' => $event->getAggregateId()->getValue(),
-                'name' => $event->getName(),
-                'type' => $event->getType(),
             ]
         );
     }
